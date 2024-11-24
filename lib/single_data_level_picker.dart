@@ -70,16 +70,21 @@ class _SingleDataLevelPickerState extends State<SingleDataLevelPicker>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TabBar(
-            isScrollable: true,
-            tabs: tabs,
-            controller: _controller,
-            labelColor: Colors.blue,
-            indicatorColor: Colors.blue,
-            dividerColor: const Color(0xFFE2E2E2),
-            dividerHeight: 0.5,
-            indicatorWeight: 1,
-            tabAlignment: TabAlignment.start,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: TabBar(
+              isScrollable: true,
+              tabs: tabs,
+              controller: _controller,
+              labelColor: Colors.blue,
+              indicatorColor: Colors.blue,
+              dividerColor: const Color(0xFFE2E2E2),
+              dividerHeight: 0.5,
+              indicatorWeight: 1,
+              tabAlignment: TabAlignment.start,
+              labelPadding: EdgeInsets.zero,
+              indicatorPadding: const EdgeInsets.only(right: 17),
+            ),
           ),
           Expanded(
               child: TabBarView(
@@ -98,13 +103,30 @@ class _SingleDataLevelPickerState extends State<SingleDataLevelPicker>
     for (int level = 0; level < _nodes.length; level++) {
       var node = _nodes[level];
       pages.add(_buildItemListView(items, level: level));
-      tabs.add(Tab(
-        text: node == null ? '请选择' : items[node].title,
-      ));
-      if (node != null) {
+      if (node == null) {
+        tabs.add(_buildTab(title: '请选择', right: 17));
+      } else {
+        var item = items[node];
+        if (item.children.isNotEmpty) {
+          tabs.add(_buildTab(title: '${item.title} 》'));
+        } else {
+          tabs.add(_buildTab(title: item.title, right: 17));
+        }
         items = items[node].children;
       }
     }
+  }
+
+  Tab _buildTab({required String title, double right = 0}) {
+    if (right == 0) {
+      return Tab(text: title);
+    }
+    return Tab(
+      child: Padding(
+        padding: EdgeInsets.only(right: right),
+        child: Text(title),
+      ),
+    );
   }
 
   Widget _buildItemListView(List<LevelDataSourceMixin> items, {int level = 0}) {
